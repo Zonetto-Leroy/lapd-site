@@ -7,8 +7,9 @@ export default async function Home() {
 
   return (
     <div>
-      <section className="relative overflow-hidden border-b border-border bg-lapd-primary">
-        <div className="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6">
+      <section className="relative overflow-hidden border-b border-border bg-lapd-primary bg-fixed bg-cover bg-center" style={{ backgroundImage: "url(/hero-bg.png)" }}>
+        <div className="absolute inset-0 bg-gradient-to-b from-lapd-primary/90 via-lapd-primary/70 to-lapd-primary/95" />
+        <div className="relative mx-auto max-w-4xl px-4 py-24 text-center sm:px-6">
           <span className="inline-flex items-center rounded-full border border-lapd-gold/50 bg-lapd-gold/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-lapd-gold">
             To Protect and to Serve
           </span>
