@@ -8,6 +8,8 @@ export default async function Header() {
 
   const navLinks = [
     { href: "/", label: "Accueil" },
+    { href: "/reglement", label: "Règlement" },
+    { href: "/grades", label: "Grades" },
     { href: "/candidater", label: "Candidater" },
     { href: "/effectif", label: "Effectif" },
     ...(session?.isStaff ? [{ href: "/staff", label: "Staff" }] : []),

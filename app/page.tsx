@@ -1,6 +1,13 @@
 import Link from "next/link";
-import { Users, ShieldCheck, UserPlus } from "lucide-react";
+import { Users, ShieldCheck, UserPlus, Scale, Handshake, Siren, ScrollText, Star } from "lucide-react";
 import { listOfficers, listAllUsers } from "@/lib/users";
+
+const VALUES = [
+  { icon: Scale, title: "Intégrité", desc: "Agir avec honnêteté, en toute transparence envers la hiérarchie et le public." },
+  { icon: Handshake, title: "Service", desc: "Le public d'abord — protection, écoute et assistance à chaque intervention." },
+  { icon: Siren, title: "Réactivité", desc: "Une réponse rapide et coordonnée face à toute situation d'urgence." },
+  { icon: Star, title: "Excellence", desc: "Une formation continue et une exigence de professionnalisme à chaque grade." },
+];
 
 export default async function Home() {
   const [officers, users] = await Promise.all([listOfficers(), listAllUsers()]);
@@ -47,6 +54,42 @@ export default async function Home() {
           <Users className="mx-auto h-5 w-5 text-foreground-muted" />
           <div className="mt-2 text-2xl font-bold">{users.length}</div>
           <div className="text-xs text-foreground-muted">Comptes inscrits</div>
+        </div>
+      </section>
+
+      <section className="border-t border-border bg-background-elevated py-16">
+        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+          <span className="inline-flex items-center rounded-full border border-lapd-gold/50 bg-lapd-gold/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-lapd-gold">
+            Notre mission
+          </span>
+          <p className="mx-auto mt-4 max-w-2xl font-display text-xl font-semibold uppercase tracking-wide text-lapd-primary sm:text-2xl">
+            Protéger et servir la ville de Los Angeles avec intégrité et professionnalisme.
+          </p>
+
+          <div className="mt-10 grid gap-4 sm:grid-cols-4">
+            {VALUES.map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="rounded-xl border border-border bg-background p-5 text-left">
+                <Icon className="h-5 w-5 text-lapd-gold" strokeWidth={1.75} />
+                <h3 className="mt-3 font-display text-sm font-semibold uppercase tracking-wide">{title}</h3>
+                <p className="mt-1.5 text-xs text-foreground-muted">{desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/reglement"
+              className="flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:border-lapd-gold"
+            >
+              <ScrollText className="h-4 w-4" /> Consulter le règlement
+            </Link>
+            <Link
+              href="/grades"
+              className="flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:border-lapd-gold"
+            >
+              <Star className="h-4 w-4" /> Voir la hiérarchie
+            </Link>
+          </div>
         </div>
       </section>
     </div>
