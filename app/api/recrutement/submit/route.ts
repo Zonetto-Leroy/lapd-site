@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { createCandidature, getCandidatureByUser } from "@/lib/candidatures";
+import { postChannelMessage } from "@/lib/discord";
 
 export async function POST(request: NextRequest) {
   const session = await getSession();
@@ -39,6 +40,33 @@ export async function POST(request: NextRequest) {
 
   if (!candidature) {
     return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  }
+
+  const channelId = process.env.RECRUITMENT_APPLICATIONS_CHANNEL_ID;
+  if (channelId) {
+    await postChannelMessage(
+      channelId,
+      [
+        {
+          title: "Nouvelle candidature — LAPD",
+          color: 0x0b2545,
+          author: { name: candidature.username },
+          fields: [
+            { name: "Compte site LAPD", value: candidature.username, inline: true },
+            { name: "Nom du personnage", value: candidature.characterName, inline: true },
+            { name: "Âge du personnage", value: candidature.characterAge || "Non précisé", inline: true },
+            { name: "Disponibilités", value: candidature.availability || "Non précisé" },
+            { name: "Expérience RP", value: candidature.experience || "Aucune précisée" },
+            { name: "Motivation", value: candidature.motivation },
+          ],
+          timestamp: candidature.createdAt,
+        },
+      ],
+      [
+        { label: "Accepter", customId: `lapd-recrutement-accept:${candidature.id}`, style: "success" },
+        { label: "Refuser", customId: `lapd-recrutement-refuse:${candidature.id}`, style: "danger" },
+      ]
+    );
   }
 
   return NextResponse.json({ ok: true, candidature });

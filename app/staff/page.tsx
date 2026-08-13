@@ -3,7 +3,6 @@ import { getFreshSession } from "@/lib/auth";
 import { listCandidatures } from "@/lib/candidatures";
 import { listOfficers } from "@/lib/users";
 import { rankIndex } from "@/lib/ranks";
-import CandidatureActions from "./CandidatureActions";
 import RankControl from "./RankControl";
 
 export default async function StaffPage() {
@@ -37,6 +36,9 @@ export default async function StaffPage() {
         <h2 className="font-display text-lg font-semibold uppercase tracking-wide">
           Candidatures en attente ({pending.length})
         </h2>
+        <p className="mt-1 text-xs text-foreground-muted">
+          Décision à prendre sur le Discord CLK, salon #candidatures-services.
+        </p>
         {pending.length > 0 ? (
           <div className="mt-4 space-y-3">
             {pending.map((c) => (
@@ -48,7 +50,9 @@ export default async function StaffPage() {
                       Compte : {c.username} · Âge : {c.characterAge || "non précisé"}
                     </p>
                   </div>
-                  <CandidatureActions id={c.id} />
+                  <span className="rounded-full border border-lapd-gold/50 bg-lapd-gold/10 px-3 py-1 text-xs font-medium text-lapd-gold">
+                    En attente sur Discord
+                  </span>
                 </div>
                 {c.experience && <p className="mt-3 text-sm text-foreground-muted">Expérience : {c.experience}</p>}
                 <p className="mt-2 text-sm">{c.motivation}</p>
