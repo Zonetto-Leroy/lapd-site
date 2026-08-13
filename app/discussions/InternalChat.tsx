@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Plus, Send, Trash2 } from "lucide-react";
+import { Lock, Plus, Send, Trash2 } from "lucide-react";
 import type { ChatChannel, ChatMessage } from "@/lib/chat";
 
 export default function InternalChat({ isStaff }: { isStaff: boolean }) {
@@ -137,8 +137,12 @@ export default function InternalChat({ isStaff }: { isStaff: boolean }) {
                   : "text-foreground-muted hover:bg-background hover:text-foreground"
               }`}
             >
-              <button onClick={() => setActiveChannelId(c.id)} className="min-w-0 flex-1 truncate px-3 py-2 text-left">
-                {c.name}
+              <button
+                onClick={() => setActiveChannelId(c.id)}
+                className="flex min-w-0 flex-1 items-center gap-1.5 truncate px-3 py-2 text-left"
+              >
+                {c.memberIds && c.memberIds.length > 0 && <Lock className="h-3 w-3 shrink-0 opacity-60" />}
+                <span className="truncate">{c.name}</span>
               </button>
               {isStaff && (
                 <button

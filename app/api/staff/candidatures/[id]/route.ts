@@ -3,6 +3,7 @@ import { getFreshSession } from "@/lib/auth";
 import { decideCandidature, listCandidatures } from "@/lib/candidatures";
 import { updateUserRank } from "@/lib/users";
 import { STARTING_RANK } from "@/lib/ranks";
+import { createWelcomeChannel } from "@/lib/chat";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getFreshSession();
@@ -29,6 +30,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   if (body.action === "accept") {
     await updateUserRank(target.userId, STARTING_RANK, target.characterName);
+    const channel = await createWelcomeChannel(target.userId, target.characterName || target.username);
+    return NextResponse.json({ ok: true, candidature: updated, welcomeChannel: channel });
   }
 
   return NextResponse.json({ ok: true, candidature: updated });

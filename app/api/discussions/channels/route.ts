@@ -4,9 +4,9 @@ import { listChannels, createChannel } from "@/lib/chat";
 
 export async function GET() {
   const session = await getFreshSession();
-  if (!isOfficer(session)) return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
+  if (!session || !isOfficer(session)) return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
 
-  const channels = await listChannels();
+  const channels = await listChannels({ userId: session.userId, isStaff: session.isStaff });
   return NextResponse.json({ channels });
 }
 
