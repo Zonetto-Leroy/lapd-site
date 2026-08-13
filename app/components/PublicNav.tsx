@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ComponentType } from "react";
 import { createPortal } from "react-dom";
-import { Menu, X, Home, ScrollText, ClipboardList, ShieldCheck, BookOpen, Users } from "lucide-react";
+import { Menu, X, Home, ScrollText, ClipboardList, ShieldCheck, BookOpen, Users, FileText, MessageSquare } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: ComponentType<{ className?: string }> };
 type NavCategory = { label: string; items: NavItem[] };
@@ -30,7 +30,11 @@ function buildCategories(showCandidater: boolean, hasRank: boolean, isStaffMembe
   if (hasRank) {
     categories.push({
       label: "Membres",
-      items: [{ href: "/ressources", label: "Ressources", icon: BookOpen }],
+      items: [
+        { href: "/ressources", label: "Ressources", icon: BookOpen },
+        { href: "/rapports", label: "Rapports", icon: FileText },
+        { href: "/discussions", label: "Discussions", icon: MessageSquare },
+      ],
     });
   }
 

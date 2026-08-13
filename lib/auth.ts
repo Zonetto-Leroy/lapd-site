@@ -60,4 +60,9 @@ export async function getFreshSession(): Promise<Session | null> {
   return { userId: user.id, username: user.username, isStaff: user.isStaff, rank: user.rank };
 }
 
+/** Un compte qui a un grade fait partie de l'effectif — accès aux outils internes (rapports, discussions...). */
+export function isOfficer(session: Session | null): boolean {
+  return Boolean(session?.rank);
+}
+
 export { SESSION_DURATION_SECONDS };
