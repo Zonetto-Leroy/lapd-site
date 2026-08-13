@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { getFreshSession } from "@/lib/auth";
 import { listCandidatures } from "@/lib/candidatures";
 import { listOfficers } from "@/lib/users";
 import { rankIndex } from "@/lib/ranks";
@@ -7,7 +7,7 @@ import CandidatureActions from "./CandidatureActions";
 import RankControl from "./RankControl";
 
 export default async function StaffPage() {
-  const session = await getSession();
+  const session = await getFreshSession();
   if (!session) redirect("/connexion");
 
   if (!session.isStaff) {

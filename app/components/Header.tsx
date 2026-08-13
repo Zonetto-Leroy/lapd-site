@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getSession } from "@/lib/auth";
+import { getFreshSession } from "@/lib/auth";
 import logo from "@/public/logo.png";
 
 export default async function Header() {
-  const session = await getSession();
+  const session = await getFreshSession();
 
   const navLinks = [
     { href: "/", label: "Accueil" },
@@ -12,6 +12,7 @@ export default async function Header() {
     { href: "/grades", label: "Grades" },
     { href: "/candidater", label: "Candidater" },
     { href: "/effectif", label: "Effectif" },
+    ...(session?.rank ? [{ href: "/ressources", label: "Ressources" }] : []),
     ...(session?.isStaff ? [{ href: "/staff", label: "Staff" }] : []),
   ];
 

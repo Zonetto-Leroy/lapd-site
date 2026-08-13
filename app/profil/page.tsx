@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogOut, ShieldCheck } from "lucide-react";
-import { getSession } from "@/lib/auth";
+import { getFreshSession } from "@/lib/auth";
 import { getCandidatureByUser } from "@/lib/candidatures";
 
 export default async function ProfilPage() {
-  const session = await getSession();
+  const session = await getFreshSession();
   if (!session) redirect("/connexion");
 
   const candidature = await getCandidatureByUser(session.userId);

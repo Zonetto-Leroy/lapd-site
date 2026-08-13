@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getFreshSession } from "@/lib/auth";
 import { updateUserRank } from "@/lib/users";
 import { isRankCode } from "@/lib/ranks";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
-  const session = await getSession();
+  const session = await getFreshSession();
   if (!session?.isStaff) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }

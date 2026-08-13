@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import type { RankCode } from "./ranks";
+import { getUserById } from "./users";
 
 export const SESSION_COOKIE_NAME = "lapd_session";
 const SESSION_DURATION_SECONDS = 60 * 60 * 24 * 7; // 7 jours
@@ -41,6 +42,22 @@ export async function getSession(): Promise<Session | null> {
   } catch {
     return null; // token invalide / expiré
   }
+}
+
+/**
+ * Comme getSession(), mais relit le grade/statut staff depuis la base plutôt que le cookie —
+ * le cookie est figé au moment de la connexion, donc une promotion/acceptation de candidature
+ * n'y apparaît pas tant que l'utilisateur ne s'est pas reconnecté. À utiliser partout où
+ * l'accès dépend du grade ou du statut staff (nav, /staff, /ressources, /profil).
+ */
+export async function getFreshSession(): Promise<Session | null> {
+  const session = await getSession();
+  if (!session) return null;
+
+  const user = await getUserById(session.userId);
+  if (!user) return null;
+
+  return { userId: user.id, username: user.username, isStaff: user.isStaff, rank: user.rank };
 }
 
 export { SESSION_DURATION_SECONDS };

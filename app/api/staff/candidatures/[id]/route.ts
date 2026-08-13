@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getFreshSession } from "@/lib/auth";
 import { decideCandidature, listCandidatures } from "@/lib/candidatures";
 import { updateUserRank } from "@/lib/users";
 import { STARTING_RANK } from "@/lib/ranks";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getSession();
+  const session = await getFreshSession();
   if (!session?.isStaff) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
