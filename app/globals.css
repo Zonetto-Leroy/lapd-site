@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --background-elevated: #f2f4f7;
+  --foreground: #0f172a;
+  --foreground-muted: #5b6472;
+  --border: #dde1e8;
+
+  /* Identité LAPD : bleu marine officiel + or badge */
+  --lapd-primary: #0b2545; /* bleu marine — bandeau/nav */
+  --lapd-gold: #c8a24b; /* or — accents, badge */
+  --lapd-danger: #b3261e; /* rouge sobre — alertes uniquement */
+  --lapd-success: #1f8a70;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-elevated: var(--background-elevated);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-border: var(--border);
+  --color-lapd-primary: var(--lapd-primary);
+  --color-lapd-gold: var(--lapd-gold);
+  --color-lapd-danger: var(--lapd-danger);
+  --color-lapd-success: var(--lapd-success);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-oswald);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@layer base {
+  a,
+  button,
+  input,
+  textarea,
+  select {
+    transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+    transition-duration: 150ms;
+    transition-timing-function: ease;
+  }
+
+  a[href]:active,
+  button:not(:disabled):active {
+    transform: scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
