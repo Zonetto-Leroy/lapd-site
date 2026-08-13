@@ -1,8 +1,13 @@
 import { redirect } from "next/navigation";
-import { FileText } from "lucide-react";
+import { FileText, Download } from "lucide-react";
 import { getFreshSession, isOfficer } from "@/lib/auth";
 import { listReports } from "@/lib/reports";
 import RapportForm from "./RapportForm";
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} Ko`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
+}
 
 export default async function RapportsPage() {
   const session = await getFreshSession();
@@ -34,24 +39,33 @@ export default async function RapportsPage() {
       {reports.length > 0 ? (
         <div className="space-y-3">
           {reports.map((r) => (
-            <div key={r.id} className="rounded-xl border border-border bg-background-elevated p-5">
-              <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-foreground-muted">
-                <span className="flex items-center gap-1.5 font-medium text-lapd-gold">
-                  <FileText className="h-3.5 w-3.5" /> {r.type}
-                </span>
-                <span>
-                  {r.authorCharacterName || r.authorUsername} ·{" "}
-                  {new Date(r.createdAt).toLocaleDateString("fr-FR", {
-                    day: "numeric",
-                    month: "short",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
+            <a
+              key={r.id}
+              href={r.fileUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background-elevated p-5 transition-colors hover:border-lapd-gold/50"
+            >
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 text-xs text-foreground-muted">
+                  <FileText className="h-3.5 w-3.5 shrink-0 text-lapd-gold" />
+                  <span>
+                    {r.authorCharacterName || r.authorUsername} ·{" "}
+                    {new Date(r.createdAt).toLocaleDateString("fr-FR", {
+                      day: "numeric",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </div>
+                <p className="mt-2 truncate font-semibold">{r.title}</p>
+                <p className="mt-1 text-xs text-foreground-muted">
+                  {r.fileName} · {formatFileSize(r.fileSize)}
+                </p>
               </div>
-              <p className="mt-2 font-semibold">{r.title}</p>
-              <p className="mt-1 whitespace-pre-wrap text-sm text-foreground-muted">{r.content}</p>
-            </div>
+              <Download className="h-5 w-5 shrink-0 text-foreground-muted" />
+            </a>
           ))}
         </div>
       ) : (

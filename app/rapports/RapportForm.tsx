@@ -1,32 +1,30 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useRef, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { REPORT_TYPES } from "@/lib/reports";
+import { REPORT_TEMPLATE_URL } from "@/lib/reports";
 
 export default function RapportForm() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSubmitting(true);
     setError(null);
 
     const form = e.currentTarget;
     const data = new FormData(form);
+    const file = data.get("file");
+    if (!(file instanceof File) || file.size === 0) {
+      setError("Merci de sélectionner un fichier.");
+      return;
+    }
 
-    const res = await fetch("/api/rapports", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: data.get("type"),
-        title: data.get("title"),
-        content: data.get("content"),
-      }),
-    });
+    setSubmitting(true);
+    const res = await fetch("/api/rapports", { method: "POST", body: data });
 
     if (res.ok) {
       form.reset();
@@ -45,60 +43,52 @@ export default function RapportForm() {
         onClick={() => setOpen(true)}
         className="rounded-full bg-lapd-primary px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
       >
-        Nouveau rapport
+        Déposer un rapport
       </button>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-border bg-background-elevated p-5">
-      <div>
-        <label htmlFor="type" className="mb-1.5 block text-sm font-medium">
-          Type de rapport
-        </label>
-        <select
-          id="type"
-          name="type"
-          required
-          defaultValue=""
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-lapd-gold"
+      <p className="text-sm text-foreground-muted">
+        Rédige ton rapport à partir du{" "}
+        <a
+          href={REPORT_TEMPLATE_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="font-medium text-lapd-gold underline underline-offset-2"
         >
-          <option value="" disabled>
-            Choisir un type
-          </option>
-          {REPORT_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-      </div>
+          modèle officiel
+        </a>
+        , puis dépose le fichier final ici.
+      </p>
 
       <div>
         <label htmlFor="title" className="mb-1.5 block text-sm font-medium">
-          Titre
+          Titre (optionnel)
         </label>
         <input
           id="title"
           name="title"
           type="text"
-          required
           maxLength={150}
+          placeholder="Ex : Arrestation — 12/08/2026"
           className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-lapd-gold"
         />
       </div>
 
       <div>
-        <label htmlFor="content" className="mb-1.5 block text-sm font-medium">
-          Contenu
+        <label htmlFor="file" className="mb-1.5 block text-sm font-medium">
+          Fichier du rapport
         </label>
-        <textarea
-          id="content"
-          name="content"
+        <input
+          ref={fileInputRef}
+          id="file"
+          name="file"
+          type="file"
           required
-          rows={6}
-          maxLength={5000}
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-lapd-gold"
+          accept=".pdf,.doc,.docx,.odt,.txt"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none file:mr-3 file:rounded-full file:border-0 file:bg-lapd-primary file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white"
         />
       </div>
 

@@ -2,23 +2,18 @@ import { getRedis } from "./redis";
 
 const REPORTS_KEY = "lapd:reports";
 
-export const REPORT_TYPES = [
-  "Rapport d'incident",
-  "Rapport d'arrestation",
-  "Rapport d'usage de la force",
-  "Rapport général",
-] as const;
-
-export type ReportType = (typeof REPORT_TYPES)[number];
+export const REPORT_TEMPLATE_URL =
+  "https://docs.google.com/document/d/14mUo5P02kAgRRqKCfXfEn0wUkvAo8iwC/edit#heading=h.gjdgxs";
 
 export type Report = {
   id: string;
   authorId: string;
   authorUsername: string;
   authorCharacterName: string | null;
-  type: ReportType;
   title: string;
-  content: string;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
   createdAt: string;
 };
 

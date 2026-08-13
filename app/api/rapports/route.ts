@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { put } from "@vercel/blob";
 import { getFreshSession, isOfficer } from "@/lib/auth";
 import { getUserById } from "@/lib/users";
-import { listReports, createReport, REPORT_TYPES, type ReportType } from "@/lib/reports";
+import { listReports, createReport } from "@/lib/reports";
+
+const MAX_SIZE_BYTES = 8 * 1024 * 1024;
 
 export async function GET() {
   const session = await getFreshSession();
@@ -17,17 +20,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
   }
 
-  const body = await request.json().catch(() => null);
-  const title = String(body?.title || "").trim();
-  const content = String(body?.content || "").trim();
-  const type = body?.type as ReportType;
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return NextResponse.json({ error: "Stockage de fichiers non configuré" }, { status: 503 });
+  }
 
-  if (!title || !content) {
-    return NextResponse.json({ error: "Titre et contenu requis" }, { status: 400 });
+  const form = await request.formData();
+  const file = form.get("file");
+  if (!(file instanceof File)) {
+    return NextResponse.json({ error: "Fichier manquant" }, { status: 400 });
   }
-  if (!REPORT_TYPES.includes(type)) {
-    return NextResponse.json({ error: "Type de rapport invalide" }, { status: 400 });
+  if (file.size > MAX_SIZE_BYTES) {
+    return NextResponse.json({ error: "Fichier trop volumineux (max 8 Mo)" }, { status: 400 });
   }
+
+  const title = String(form.get("title") || "").trim().slice(0, 150) || file.name;
+
+  const blob = await put(`rapports/${crypto.randomUUID()}-${file.name}`, file, {
+    access: "public",
+    addRandomSuffix: false,
+  });
 
   const user = await getUserById(session.userId);
 
@@ -35,9 +46,10 @@ export async function POST(request: Request) {
     authorId: session.userId,
     authorUsername: session.username,
     authorCharacterName: user?.characterName ?? null,
-    type,
-    title: title.slice(0, 150),
-    content: content.slice(0, 5000),
+    title,
+    fileUrl: blob.url,
+    fileName: file.name,
+    fileSize: file.size,
   });
 
   if (!report) {
