@@ -1,15 +1,19 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
 export default function RecruitmentForm() {
+  const router = useRouter();
   const [status, setStatus] = useState<Status>("idle");
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("submitting");
+    setError(null);
 
     const form = e.currentTarget;
     const data = new FormData(form);
@@ -29,7 +33,10 @@ export default function RecruitmentForm() {
     if (res.ok) {
       setStatus("success");
       form.reset();
+      router.refresh();
     } else {
+      const body = await res.json().catch(() => null);
+      setError(body?.error === "already_applied" ? "Tu as déjà une candidature en cours." : "Une erreur est survenue.");
       setStatus("error");
     }
   }
@@ -37,7 +44,7 @@ export default function RecruitmentForm() {
   if (status === "success") {
     return (
       <div className="rounded-xl border border-lapd-success/40 bg-lapd-success/10 p-6 text-center text-sm text-lapd-success">
-        Ta candidature a bien été envoyée à l&apos;équipe LAPD. Tu seras recontacté sur Discord.
+        Ta candidature a bien été envoyée. L&apos;équipe du LAPD l&apos;examinera prochainement.
       </div>
     );
   }
@@ -108,13 +115,11 @@ export default function RecruitmentForm() {
           type="text"
           maxLength={200}
           placeholder="Ex : soirs de semaine, week-ends…"
-          className="w-full rounded-lg border border-border bg-background-elevated px-3 py-2 text-sm outline-none focus:border-lapd-gold"
+          className="w-full rounded-lg border border-border bg-background-elevated px-3 py-2 text-sm outline-none placeholder:text-foreground-muted focus:border-lapd-gold"
         />
       </div>
 
-      {status === "error" && (
-        <p className="text-sm text-lapd-danger">Une erreur est survenue lors de l&apos;envoi. Réessaie.</p>
-      )}
+      {error && <p className="text-sm text-lapd-danger">{error}</p>}
 
       <button
         type="submit"

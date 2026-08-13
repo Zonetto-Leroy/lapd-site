@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Users, Radio, Rocket, UserPlus, ShieldCheck } from "lucide-react";
-import { fetchGuildStats } from "@/lib/discord";
+import { Users, ShieldCheck, UserPlus } from "lucide-react";
+import { listOfficers, listAllUsers } from "@/lib/users";
 
 export default async function Home() {
-  const stats = await fetchGuildStats().catch(() => null);
+  const [officers, users] = await Promise.all([listOfficers(), listAllUsers()]);
 
   return (
     <div>
@@ -27,34 +27,27 @@ export default async function Home() {
               <UserPlus className="h-4 w-4" /> Candidater
             </Link>
             <Link
-              href="/membres"
+              href="/effectif"
               className="flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition-colors hover:border-white"
             >
-              <ShieldCheck className="h-4 w-4" /> Annuaire des membres
+              <ShieldCheck className="h-4 w-4" /> Effectif
             </Link>
           </div>
         </div>
       </section>
 
-      {stats && (
-        <section className="mx-auto grid max-w-4xl grid-cols-3 gap-4 px-4 py-10 sm:px-6">
-          <div className="rounded-xl border border-border bg-background-elevated p-5 text-center">
-            <Users className="mx-auto h-5 w-5 text-foreground-muted" />
-            <div className="mt-2 text-2xl font-bold">{stats.memberCount.toLocaleString("fr-FR")}</div>
-            <div className="text-xs text-foreground-muted">Membres</div>
-          </div>
-          <div className="rounded-xl border border-border bg-background-elevated p-5 text-center">
-            <Radio className="mx-auto h-5 w-5 text-lapd-success" />
-            <div className="mt-2 text-2xl font-bold">{stats.onlineCount.toLocaleString("fr-FR")}</div>
-            <div className="text-xs text-foreground-muted">En ligne</div>
-          </div>
-          <div className="rounded-xl border border-border bg-background-elevated p-5 text-center">
-            <Rocket className="mx-auto h-5 w-5 text-foreground-muted" />
-            <div className="mt-2 text-2xl font-bold">{stats.boostCount.toLocaleString("fr-FR")}</div>
-            <div className="text-xs text-foreground-muted">Boosts</div>
-          </div>
-        </section>
-      )}
+      <section className="mx-auto grid max-w-4xl grid-cols-2 gap-4 px-4 py-10 sm:px-6">
+        <div className="rounded-xl border border-border bg-background-elevated p-5 text-center">
+          <ShieldCheck className="mx-auto h-5 w-5 text-lapd-gold" />
+          <div className="mt-2 text-2xl font-bold">{officers.length}</div>
+          <div className="text-xs text-foreground-muted">Officiers en poste</div>
+        </div>
+        <div className="rounded-xl border border-border bg-background-elevated p-5 text-center">
+          <Users className="mx-auto h-5 w-5 text-foreground-muted" />
+          <div className="mt-2 text-2xl font-bold">{users.length}</div>
+          <div className="text-xs text-foreground-muted">Comptes inscrits</div>
+        </div>
+      </section>
     </div>
   );
 }

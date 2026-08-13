@@ -3,14 +3,15 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import logo from "@/public/logo.png";
 
-const NAV_LINKS = [
-  { href: "/", label: "Accueil" },
-  { href: "/candidater", label: "Candidater" },
-  { href: "/membres", label: "Membres" },
-];
-
 export default async function Header() {
   const session = await getSession();
+
+  const navLinks = [
+    { href: "/", label: "Accueil" },
+    { href: "/candidater", label: "Candidater" },
+    { href: "/effectif", label: "Effectif" },
+    ...(session?.isStaff ? [{ href: "/staff", label: "Staff" }] : []),
+  ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/90 shadow-sm backdrop-blur">
@@ -28,7 +29,7 @@ export default async function Header() {
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm font-medium text-foreground-muted sm:flex">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <Link key={link.href} href={link.href} className="hover:text-foreground">
               {link.label}
             </Link>
@@ -38,22 +39,19 @@ export default async function Header() {
         {session ? (
           <Link
             href="/profil"
-            className="flex items-center gap-2 rounded-full border border-border py-1 pl-1 pr-3 text-sm font-medium transition-colors hover:border-lapd-gold"
+            className="flex items-center gap-2 rounded-full border border-border py-1.5 pl-3 pr-3 text-sm font-medium transition-colors hover:border-lapd-gold"
           >
-            {session.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={session.avatarUrl} alt="" className="h-7 w-7 rounded-full" />
-            ) : (
-              <span className="h-7 w-7 rounded-full bg-lapd-primary" />
-            )}
-            {session.displayName}
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-lapd-primary text-[10px] font-bold text-white">
+              {session.username.slice(0, 2).toUpperCase()}
+            </div>
+            {session.username}
           </Link>
         ) : (
           <Link
-            href="/api/auth/discord/login"
+            href="/connexion"
             className="rounded-full bg-lapd-primary px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
-            Se connecter avec Discord
+            Se connecter
           </Link>
         )}
       </div>
