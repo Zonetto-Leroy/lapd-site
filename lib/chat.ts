@@ -71,8 +71,9 @@ export async function createChannel(name: string, memberIds?: string[]): Promise
 }
 
 /**
- * Ouvre un salon privé (recrue + staff) à l'acceptation d'une candidature, pour
- * l'accueil — équivalent du ticket Discord ouvert automatiquement côté CHP.
+ * Ouvre un salon privé (recrue + staff) quand le staff attribue son premier grade à
+ * un compte — sert d'accueil pour les nouvelles recrues (le recrutement lui-même se
+ * fait désormais sur le site principal CLK, comme les autres départements).
  */
 export async function createWelcomeChannel(userId: string, displayName: string): Promise<ChatChannel | null> {
   const channel = await createChannel(`Accueil — ${displayName}`, [userId]);

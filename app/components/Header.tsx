@@ -1,16 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getFreshSession } from "@/lib/auth";
-import { getCandidatureByUser } from "@/lib/candidatures";
 import logo from "@/public/logo.png";
 import PublicNav from "./PublicNav";
 
 export default async function Header() {
   const session = await getFreshSession();
-  const candidature = session ? await getCandidatureByUser(session.userId) : null;
-  // Une fois candidaté (en attente ou accepté), plus besoin de voir l'onglet — sauf en cas de refus,
-  // où il doit pouvoir re-candidater.
-  const showCandidater = !session || !candidature || candidature.status === "refused";
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/90 shadow-sm backdrop-blur">
@@ -27,11 +22,7 @@ export default async function Header() {
           <span className="font-display text-lg font-semibold uppercase tracking-wide">LAPD</span>
         </Link>
 
-        <PublicNav
-          showCandidater={showCandidater}
-          hasRank={Boolean(session?.rank)}
-          isStaffMember={Boolean(session?.isStaff)}
-        />
+        <PublicNav hasRank={Boolean(session?.rank)} isStaffMember={Boolean(session?.isStaff)} />
 
         {session ? (
           <Link

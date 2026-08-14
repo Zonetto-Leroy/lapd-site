@@ -25,5 +25,5 @@ export function rankIndex(rank: RankCode): number {
   return RANKS.indexOf(rank);
 }
 
-/** Grade de départ attribué automatiquement quand une candidature est acceptée. */
+/** Grade de départ proposé par défaut quand le staff intègre une nouvelle recrue à l'effectif. */
 export const STARTING_RANK: RankCode = "Police Officer I";

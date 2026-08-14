@@ -4,24 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ComponentType } from "react";
 import { createPortal } from "react-dom";
-import { Menu, X, Home, ScrollText, ClipboardList, ShieldCheck, BookOpen, Users, FileText, MessageSquare } from "lucide-react";
+import { Menu, X, Home, ScrollText, ShieldCheck, BookOpen, Users, FileText, MessageSquare } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: ComponentType<{ className?: string }> };
 type NavCategory = { label: string; items: NavItem[] };
 
-function buildCategories(showCandidater: boolean, hasRank: boolean, isStaffMember: boolean): NavCategory[] {
+function buildCategories(hasRank: boolean, isStaffMember: boolean): NavCategory[] {
   const categories: NavCategory[] = [
     {
       label: "Département",
       items: [
         { href: "/", label: "Accueil", icon: Home },
         { href: "/reglement", label: "Règlement", icon: ScrollText },
-      ],
-    },
-    {
-      label: "Rejoindre",
-      items: [
-        ...(showCandidater ? [{ href: "/candidater", label: "Candidater", icon: ClipboardList }] : []),
         { href: "/effectif", label: "Effectif", icon: Users },
       ],
     },
@@ -49,11 +43,9 @@ function buildCategories(showCandidater: boolean, hasRank: boolean, isStaffMembe
 }
 
 export default function PublicNav({
-  showCandidater,
   hasRank,
   isStaffMember,
 }: {
-  showCandidater: boolean;
   hasRank: boolean;
   isStaffMember: boolean;
 }) {
@@ -65,7 +57,7 @@ export default function PublicNav({
   // couvrir tout l'écran. On échappe le tiroir via un portail dans <body>,
   // qui n'existe qu'une fois monté côté client.
   const [mounted] = useState(() => typeof document !== "undefined");
-  const categories = buildCategories(showCandidater, hasRank, isStaffMember);
+  const categories = buildCategories(hasRank, isStaffMember);
 
   const drawer = open && (
     <div className="fixed inset-0 z-[60] flex" onClick={() => setOpen(false)}>

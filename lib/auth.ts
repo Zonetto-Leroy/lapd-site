@@ -46,8 +46,8 @@ export async function getSession(): Promise<Session | null> {
 
 /**
  * Comme getSession(), mais relit le grade/statut staff depuis la base plutôt que le cookie —
- * le cookie est figé au moment de la connexion, donc une promotion/acceptation de candidature
- * n'y apparaît pas tant que l'utilisateur ne s'est pas reconnecté. À utiliser partout où
+ * le cookie est figé au moment de la connexion, donc une promotion n'y apparaît pas tant que
+ * l'utilisateur ne s'est pas reconnecté. À utiliser partout où
  * l'accès dépend du grade ou du statut staff (nav, /staff, /ressources, /profil).
  */
 export async function getFreshSession(): Promise<Session | null> {

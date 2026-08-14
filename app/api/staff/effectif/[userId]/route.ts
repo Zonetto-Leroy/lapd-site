@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFreshSession } from "@/lib/auth";
-import { updateUserRank } from "@/lib/users";
+import { getUserById, updateUserRank } from "@/lib/users";
 import { isRankCode } from "@/lib/ranks";
+import { createWelcomeChannel } from "@/lib/chat";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   const session = await getFreshSession();
@@ -17,11 +18,23 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Grade invalide" }, { status: 400 });
   }
 
+  const target = await getUserById(userId);
+  if (!target) {
+    return NextResponse.json({ error: "Compte introuvable" }, { status: 404 });
+  }
+
+  const characterName = typeof body.characterName === "string" ? body.characterName : undefined;
   await updateUserRank(
     userId,
     body.rank,
-    typeof body.characterName === "string" ? body.characterName : undefined,
+    characterName,
     typeof body.badgeNumber === "string" ? body.badgeNumber : undefined
   );
+
+  // Premier grade attribué à ce compte : ouvre son salon d'accueil.
+  if (target.rank === null && body.rank !== null) {
+    await createWelcomeChannel(userId, characterName || target.characterName || target.username);
+  }
+
   return NextResponse.json({ ok: true });
 }

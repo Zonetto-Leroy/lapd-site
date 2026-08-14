@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { getFreshSession } from "@/lib/auth";
-import { listCandidatures } from "@/lib/candidatures";
-import { listOfficers } from "@/lib/users";
+import { listAllUsers, listOfficers } from "@/lib/users";
 import { rankIndex } from "@/lib/ranks";
 import RankControl from "./RankControl";
+import PromoteControl from "./PromoteControl";
 
 export default async function StaffPage() {
   const session = await getFreshSession();
@@ -18,10 +18,9 @@ export default async function StaffPage() {
     );
   }
 
-  const [candidatures, officers] = await Promise.all([listCandidatures(), listOfficers()]);
-  const pending = candidatures.filter((c) => c.status === "pending");
-  const decided = candidatures.filter((c) => c.status !== "pending").slice(0, 10);
+  const [officers, allUsers] = await Promise.all([listOfficers(), listAllUsers()]);
   const sortedOfficers = [...officers].sort((a, b) => rankIndex(b.rank!) - rankIndex(a.rank!));
+  const unranked = allUsers.filter((u) => u.rank === null);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
@@ -31,41 +30,6 @@ export default async function StaffPage() {
         </span>
         <h1 className="mt-4 font-display text-3xl font-semibold uppercase tracking-wide">Espace staff</h1>
       </div>
-
-      <section className="mb-10">
-        <h2 className="font-display text-lg font-semibold uppercase tracking-wide">
-          Candidatures en attente ({pending.length})
-        </h2>
-        <p className="mt-1 text-xs text-foreground-muted">
-          Décision à prendre sur le Discord CLK, salon #candidatures-services.
-        </p>
-        {pending.length > 0 ? (
-          <div className="mt-4 space-y-3">
-            {pending.map((c) => (
-              <div key={c.id} className="rounded-xl border border-border bg-background-elevated p-5">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="font-semibold">{c.characterName}</p>
-                    <p className="text-xs text-foreground-muted">
-                      Compte : {c.username} · Âge : {c.characterAge || "non précisé"}
-                    </p>
-                  </div>
-                  <span className="rounded-full border border-lapd-gold/50 bg-lapd-gold/10 px-3 py-1 text-xs font-medium text-lapd-gold">
-                    En attente sur Discord
-                  </span>
-                </div>
-                {c.experience && <p className="mt-3 text-sm text-foreground-muted">Expérience : {c.experience}</p>}
-                <p className="mt-2 text-sm">{c.motivation}</p>
-                {c.availability && (
-                  <p className="mt-2 text-xs text-foreground-muted">Disponibilités : {c.availability}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="mt-4 text-sm text-foreground-muted">Aucune candidature en attente.</p>
-        )}
-      </section>
 
       <section className="mb-10">
         <h2 className="font-display text-lg font-semibold uppercase tracking-wide">
@@ -91,26 +55,35 @@ export default async function StaffPage() {
         )}
       </section>
 
-      {decided.length > 0 && (
-        <section>
-          <h2 className="font-display text-lg font-semibold uppercase tracking-wide">Historique récent</h2>
+      <section>
+        <h2 className="font-display text-lg font-semibold uppercase tracking-wide">
+          Comptes sans grade ({unranked.length})
+        </h2>
+        <p className="mt-1 text-xs text-foreground-muted">
+          Recrues acceptées via le recrutement CLK (Discord) qui se sont créé un compte ici — intègre-les à
+          l&apos;effectif pour leur donner accès aux outils internes.
+        </p>
+        {unranked.length > 0 ? (
           <div className="mt-4 space-y-2">
-            {decided.map((c) => (
+            {unranked.map((u) => (
               <div
-                key={c.id}
-                className="flex items-center justify-between rounded-xl border border-border bg-background-elevated p-4 text-sm"
+                key={u.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background-elevated p-4"
               >
-                <span>
-                  {c.characterName} ({c.username})
-                </span>
-                <span className={c.status === "accepted" ? "text-lapd-success" : "text-lapd-danger"}>
-                  {c.status === "accepted" ? "Acceptée" : "Refusée"} par {c.decidedBy}
-                </span>
+                <div>
+                  <p className="text-sm font-semibold">{u.username}</p>
+                  <p className="text-xs text-foreground-muted">
+                    Inscrit le {new Date(u.createdAt).toLocaleDateString("fr-FR")}
+                  </p>
+                </div>
+                <PromoteControl userId={u.id} />
               </div>
             ))}
           </div>
-        </section>
-      )}
+        ) : (
+          <p className="mt-4 text-sm text-foreground-muted">Aucun compte en attente d&apos;intégration.</p>
+        )}
+      </section>
     </div>
   );
 }

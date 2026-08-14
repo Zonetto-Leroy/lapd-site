@@ -1,14 +1,10 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { LogOut, ShieldCheck } from "lucide-react";
 import { getFreshSession } from "@/lib/auth";
-import { getCandidatureByUser } from "@/lib/candidatures";
 
 export default async function ProfilPage() {
   const session = await getFreshSession();
   if (!session) redirect("/connexion");
-
-  const candidature = await getCandidatureByUser(session.userId);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
@@ -33,14 +29,10 @@ export default async function ProfilPage() {
               <p className="text-sm uppercase tracking-wide text-foreground-muted">Grade actuel</p>
               <p className="mt-1 font-display text-3xl font-bold text-lapd-primary">{session.rank}</p>
             </>
-          ) : candidature?.status === "pending" ? (
-            <p className="text-foreground-muted">Ta candidature est en attente d&apos;examen.</p>
           ) : (
             <p className="text-foreground-muted">
-              Tu n&apos;es pas encore membre du LAPD.{" "}
-              <Link href="/candidater" className="text-lapd-gold underline underline-offset-4">
-                Candidater
-              </Link>
+              Tu n&apos;es pas encore membre du LAPD. Le recrutement se fait sur le site principal CLK ; une
+              fois accepté, le staff t&apos;intègre à l&apos;effectif depuis cet espace.
             </p>
           )}
         </div>
